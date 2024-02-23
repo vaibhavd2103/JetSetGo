@@ -286,7 +286,10 @@ const Home = () => {
                 value: filters?.price?.toString(),
                 keyboardType: 'numeric',
                 onChangeText(text) {
-                  setFilters(prev => ({...prev, price: parseInt(text, 10)}));
+                  setFilters(prev => ({
+                    ...prev,
+                    price: text ? parseInt(text, 10) : 0,
+                  }));
                 },
               }}
             />
