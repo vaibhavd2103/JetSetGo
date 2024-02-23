@@ -1,4 +1,5 @@
 import {
+  Alert,
   KeyboardAvoidingView,
   ScrollView,
   StyleSheet,
@@ -6,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {COLORS} from '../constants/colors';
 import {Input} from '../components/Inputs';
 import {Button} from '../components/Buttons';
@@ -16,6 +17,20 @@ import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
 const Login = () => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [fields, setFields] = useState({
+    email: '',
+    password: '',
+  });
+  const validator = () => {
+    let valid = true;
+    if (fields.email === '') {
+      valid = false;
+    }
+    if (fields.password === '') {
+      valid = false;
+    }
+    return valid;
+  };
 
   return (
     <KeyboardAvoidingView style={styles.outer}>
@@ -27,17 +42,31 @@ const Login = () => {
           width={'100%'}
           props={{
             placeholder: 'Enter email',
+            value: fields.email,
+            onChangeText(text) {
+              setFields(prev => ({...prev, email: text}));
+            },
+            inputMode: 'email',
           }}
         />
         <Input
           width={'100%'}
           props={{
             placeholder: 'Enter password',
+            value: fields.password,
+            onChangeText(text) {
+              setFields(prev => ({...prev, password: text}));
+            },
           }}
         />
         <Button
           onPress={() => {
-            navigation.navigate(SCREENS.HOME);
+            const valid = validator();
+            if (valid) {
+              navigation.navigate(SCREENS.HOME);
+            } else {
+              Alert.alert('Please provide all the fields!');
+            }
           }}
           width={'100%'}>
           Login

@@ -42,7 +42,7 @@ const FlightCard = ({item}: {item: FlightType}) => {
           <Text style={{...styles.normal, fontStyle: 'italic', fontSize: 12}}>
             ({item.displayData.airlines[0].flightNumber})
           </Text>
-          <Entypo name="aircraft" size={30} color={COLORS.primary} />
+          {/* <Entypo name="aircraft" size={30} color={COLORS.primary} /> */}
           <Text
             style={{
               ...styles.bold,

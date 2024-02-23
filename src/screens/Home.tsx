@@ -1,5 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
-import {FlatList, StyleSheet, Text, View} from 'react-native';
+import {
+  Alert,
+  FlatList,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import HomeHeader from '../components/Header';
 import axios from 'axios';
@@ -42,12 +49,14 @@ const Home = () => {
                     filters.from &&
                     item.displayData.source.airport.cityName
                       .toLowerCase()
-                      .includes(filters.from.toLowerCase())
+                      .includes(filters.from.toLowerCase()) &&
+                    filters.to &&
+                    item.displayData.destination.airport.cityName
+                      .toLowerCase()
+                      .includes(filters.to.toLowerCase()) &&
+                    filters.price &&
+                    item.fare < filters.price
                   ) {
-                    console.log(
-                      item.displayData.source.airport.cityName.toLowerCase() ===
-                        filters.from.toLowerCase(),
-                    );
                     arr.push(item);
                   }
                 }
@@ -67,10 +76,23 @@ const Home = () => {
     }
   }, [filterSet, filters]);
 
+  const validator = () => {
+    let valid = true;
+    if (!filters?.from || filters?.from === '') {
+      valid = false;
+    }
+    if (!filters?.to || filters?.to === '') {
+      valid = false;
+    }
+    if (!filters?.price || filters?.price === 0) {
+      valid = false;
+    }
+    return valid;
+  };
+
   return (
     <View style={styles.container}>
       <HomeHeader />
-
       {filterSet ? (
         loading ? (
           <View style={styles.loaderContainer}>
@@ -78,176 +100,200 @@ const Home = () => {
           </View>
         ) : (
           <FlatList
-            // eslint-disable-next-line react/no-unstable-nested-components
-            ListHeaderComponent={() => {
-              return (
-                <>
-                  {filterSet && (
-                    <View style={styles.headerFilter}>
-                      <Entypo
-                        name="aircraft"
-                        size={100}
-                        color={'#000'}
-                        style={styles.headerIcon}
-                      />
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                        }}>
-                        <View>
-                          <Text style={{color: '#fff'}}>From:</Text>
-                          <Text
-                            style={{
-                              fontWeight: 'bold',
-                              color: '#fff',
-                              fontSize: 24,
-                              lineHeight: 24,
-                            }}>
-                            {filters?.from}
-                          </Text>
-                        </View>
-                        <View>
-                          <Text style={{color: '#fff', textAlign: 'right'}}>
-                            To:
-                          </Text>
-                          <Text
-                            style={{
-                              fontWeight: 'bold',
-                              color: '#fff',
-                              fontSize: 24,
-                              lineHeight: 24,
-                            }}>
-                            {filters?.to}
-                          </Text>
-                        </View>
-                      </View>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          width: '100%',
-                        }}>
-                        <View>
-                          <Text style={{color: '#fff'}}>Date:</Text>
-                          <Text
-                            style={{
-                              fontWeight: 'bold',
-                              color: '#fff',
-                              fontSize: 18,
-                              lineHeight: 18,
-                            }}>
-                            {filters?.date?.toDateString()}
-                          </Text>
-                        </View>
-                        <View>
-                          <Text style={{color: '#fff', textAlign: 'right'}}>
-                            Price:
-                          </Text>
-                          <Text
-                            style={{
-                              fontWeight: 'bold',
-                              color: '#fff',
-                              fontSize: 18,
-                              lineHeight: 18,
-                            }}>
-                            {filters?.price}
-                          </Text>
-                        </View>
-                      </View>
-                      <Button
-                        onPress={() => {
-                          setFilterSet(false);
-                        }}
-                        style={{
-                          backgroundColor: '#0005',
-                          width: 140,
-                        }}>
-                        <Text>Change</Text>
-                      </Button>
-                    </View>
-                  )}
-                </>
-              );
-            }}
             data={flights}
             renderItem={({item}) => {
               return <FlightCard item={item} />;
             }}
+            ListEmptyComponent={
+              <View
+                style={{
+                  width,
+                  height: '100%',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Text style={{textAlign: 'center', maxWidth: '70%'}}>
+                  No flights available for the provided data! Kindly update the
+                  filter.
+                </Text>
+              </View>
+            }
+            ListHeaderComponent={
+              <>
+                {filterSet && (
+                  <View style={styles.headerFilter}>
+                    <Entypo
+                      name="aircraft"
+                      size={100}
+                      color={'#000'}
+                      style={styles.headerIcon}
+                    />
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}>
+                      <View>
+                        <Text style={{color: '#fff'}}>From:</Text>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            fontSize: 24,
+                            lineHeight: 24,
+                          }}>
+                          {filters?.from}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={{color: '#fff', textAlign: 'right'}}>
+                          To:
+                        </Text>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            fontSize: 24,
+                            lineHeight: 24,
+                          }}>
+                          {filters?.to}
+                        </Text>
+                      </View>
+                    </View>
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        width: '100%',
+                      }}>
+                      <View>
+                        <Text style={{color: '#fff'}}>Date:</Text>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            fontSize: 18,
+                            lineHeight: 18,
+                          }}>
+                          {filters?.date?.toDateString()}
+                        </Text>
+                      </View>
+                      <View>
+                        <Text style={{color: '#fff', textAlign: 'right'}}>
+                          Price:
+                        </Text>
+                        <Text
+                          style={{
+                            fontWeight: 'bold',
+                            color: '#fff',
+                            fontSize: 18,
+                            lineHeight: 18,
+                          }}>
+                          {filters?.price}
+                        </Text>
+                      </View>
+                    </View>
+                    <Button
+                      onPress={() => {
+                        setFilterSet(false);
+                      }}
+                      style={{
+                        backgroundColor: '#0005',
+                        width: 140,
+                      }}>
+                      <Text>Change</Text>
+                    </Button>
+                  </View>
+                )}
+              </>
+            }
           />
         )
       ) : (
-        <View style={styles.inputContainer}>
-          <Text style={styles.enterDetails}>
-            Enter the details of your travel and we will get you the best
-            available flights
-          </Text>
-          <View style={styles.row}>
+        <ImageBackground
+          blurRadius={50}
+          style={{width, height: '100%'}}
+          source={{
+            uri: 'https://w0.peakpx.com/wallpaper/609/335/HD-wallpaper-artistic-plane-in-the-sky-clouds-flight-art-aeroplane-thumbnail.jpg',
+            // uri: 'https://wallpapercosmos.com/w/full/3/5/2/1274861-2160x3840-samsung-4k-aircraft-wallpaper-photo.jpg',
+          }}>
+          <View style={styles.inputContainer}>
+            <Text style={styles.enterDetails}>
+              Enter the details of your travel and we will get you the best
+              available flights
+            </Text>
+            <View style={styles.row}>
+              <Input
+                props={{
+                  placeholder: 'Source',
+                  value: filters?.from,
+                  onChangeText(text) {
+                    setFilters(prev => ({...prev, from: text}));
+                  },
+                }}
+                width={width / 2 - 20}
+              />
+              <Input
+                props={{
+                  placeholder: 'Destination',
+                  value: filters?.to,
+                  onChangeText(text) {
+                    setFilters(prev => ({...prev, to: text}));
+                  },
+                }}
+                width={width / 2 - 20}
+              />
+            </View>
             <Input
+              style={{marginTop: 10}}
               props={{
-                placeholder: 'Source',
-                value: filters?.from,
-                onChangeText(text) {
-                  setFilters(prev => ({...prev, from: text}));
+                placeholder: 'Enter date of travel',
+                value: filters?.date?.toDateString(),
+                onFocus() {
+                  setDatePicker(true);
                 },
               }}
-              width={width / 2 - 20}
+            />
+            <DatePicker
+              modal
+              mode="date"
+              open={datePicker}
+              date={filters?.date ?? new Date()}
+              onConfirm={date => {
+                setDatePicker(false);
+                setFilters(prev => ({...prev, date}));
+              }}
+              onCancel={() => {
+                setDatePicker(false);
+              }}
             />
             <Input
+              style={{marginTop: 10}}
               props={{
-                placeholder: 'Destination',
-                value: filters?.to,
+                placeholder: 'Expected price',
+                value: filters?.price?.toString(),
+                keyboardType: 'numeric',
                 onChangeText(text) {
-                  setFilters(prev => ({...prev, to: text}));
+                  setFilters(prev => ({...prev, price: parseInt(text, 10)}));
                 },
               }}
-              width={width / 2 - 20}
             />
+            <Button
+              width={'100%'}
+              style={{marginTop: 10}}
+              onPress={() => {
+                const isValid = validator();
+                if (isValid) {
+                  setFilterSet(true);
+                } else {
+                  Alert.alert('Please provide all the fields');
+                }
+              }}>
+              Search flights
+            </Button>
           </View>
-          <Input
-            style={{marginTop: 10}}
-            props={{
-              placeholder: 'Enter date of travel',
-              value: filters?.date?.toDateString(),
-              onFocus() {
-                setDatePicker(true);
-              },
-            }}
-          />
-          <DatePicker
-            modal
-            mode="date"
-            open={datePicker}
-            date={filters?.date ?? new Date()}
-            onConfirm={date => {
-              setDatePicker(false);
-              setFilters(prev => ({...prev, date}));
-            }}
-            onCancel={() => {
-              setDatePicker(false);
-            }}
-          />
-          <Input
-            style={{marginTop: 10}}
-            props={{
-              placeholder: 'Expected price',
-              value: filters?.price?.toString(),
-              keyboardType: 'numeric',
-              onChangeText(text) {
-                setFilters(prev => ({...prev, price: parseInt(text, 10)}));
-              },
-            }}
-          />
-          <Button
-            width={'100%'}
-            style={{marginTop: 10}}
-            onPress={() => {
-              setFilterSet(true);
-            }}>
-            Search flights
-          </Button>
-        </View>
+        </ImageBackground>
       )}
     </View>
   );
@@ -258,7 +304,7 @@ export default Home;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.white,
+    // backgroundColor: COLORS.white,
   },
   loaderContainer: {
     justifyContent: 'center',
@@ -269,7 +315,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
+    // backgroundColor: COLORS.white,
     paddingHorizontal: 16,
     width: width,
   },
@@ -282,7 +328,7 @@ const styles = StyleSheet.create({
   enterDetails: {
     textAlign: 'center',
     fontSize: 16,
-    color: COLORS.dark,
+    color: COLORS.white,
     fontWeight: '600',
     maxWidth: width - 100,
     marginBottom: 20,
