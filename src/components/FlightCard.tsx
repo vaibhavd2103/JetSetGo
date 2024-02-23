@@ -66,14 +66,7 @@ const FlightCard = ({item}: {item: FlightType}) => {
           </Text>
         </View>
       </View>
-      <View
-        style={{
-          height: 1,
-          width: '100%',
-          backgroundColor: '#ddd',
-          marginVertical: 10,
-        }}
-      />
+      <View style={styles.divider} />
       <View style={{...styles.row}}>
         <View>
           <Text style={{...styles.normal, fontSize: 14}}>Price :</Text>
@@ -108,12 +101,19 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    elevation: 10,
+    elevation: 20,
     backgroundColor: COLORS.white,
     marginVertical: 10,
     width: width - 32,
     alignSelf: 'center',
     borderRadius: 10,
+    shadowColor: COLORS.primary,
+    shadowOpacity: 1,
+    shadowRadius: 0,
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
   },
   row: {
     flexDirection: 'row',
@@ -128,5 +128,11 @@ const styles = StyleSheet.create({
   normal: {
     fontSize: 14,
     color: '#000',
+  },
+  divider: {
+    height: 1,
+    width: '100%',
+    backgroundColor: '#ddd',
+    marginVertical: 10,
   },
 });

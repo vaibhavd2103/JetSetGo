@@ -37,7 +37,8 @@ const Login = () => {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.contentStyle}>
-        <Text style={styles.title}>Login</Text>
+        <Text style={styles.title}>Welcome back!</Text>
+        <Text style={styles.subTitle}>Please login to continue</Text>
         <Input
           width={'100%'}
           props={{
@@ -100,6 +101,7 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: 'bold',
     color: COLORS.primary,
+    textAlign: 'center',
   },
   contentStyle: {
     alignItems: 'center',
@@ -119,5 +121,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: COLORS.dark,
+  },
+  subTitle: {
+    fontSize: 16,
+    color: COLORS.secondary,
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
 });

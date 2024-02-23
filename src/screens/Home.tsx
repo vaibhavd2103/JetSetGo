@@ -5,6 +5,7 @@ import {
   ImageBackground,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
@@ -27,6 +28,7 @@ const Home = () => {
   const [filters, setFilters] = useState<FilterType | undefined>();
   const [filterSet, setFilterSet] = useState(false);
   const [datePicker, setDatePicker] = useState(false);
+  const [ascending, setAscending] = useState(true);
 
   useEffect(() => {
     const getFlightsData = async () => {
@@ -90,6 +92,31 @@ const Home = () => {
     return valid;
   };
 
+  const dataSortingByPrice = () => {
+    let arr = [...flights];
+    try {
+      if (ascending) {
+        const sortedArr = arr.sort((a, b) => a.fare - b.fare);
+        setFlights(sortedArr);
+      } else {
+        const sortedArr = arr.sort((a, b) => b.fare - a.fare);
+        setFlights(sortedArr);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (filterSet && flights.length > 0) {
+      setLoading(true);
+      dataSortingByPrice();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ascending]);
+
   return (
     <View style={styles.container}>
       <HomeHeader />
@@ -105,13 +132,7 @@ const Home = () => {
               return <FlightCard item={item} />;
             }}
             ListEmptyComponent={
-              <View
-                style={{
-                  width,
-                  height: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
+              <View style={styles.blockCenter}>
                 <Text style={{textAlign: 'center', maxWidth: '70%'}}>
                   No flights available for the provided data! Kindly update the
                   filter.
@@ -128,82 +149,68 @@ const Home = () => {
                       color={'#000'}
                       style={styles.headerIcon}
                     />
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                      }}>
+                    <View style={styles.row}>
                       <View>
-                        <Text style={{color: '#fff'}}>From:</Text>
-                        <Text
-                          style={{
-                            fontWeight: 'bold',
-                            color: '#fff',
-                            fontSize: 24,
-                            lineHeight: 24,
-                          }}>
-                          {filters?.from}
-                        </Text>
+                        <Text style={{...styles.normal}}>From:</Text>
+                        <Text style={styles.bold}>{filters?.from}</Text>
                       </View>
                       <View>
-                        <Text style={{color: '#fff', textAlign: 'right'}}>
+                        <Text style={{...styles.normal, textAlign: 'right'}}>
                           To:
                         </Text>
-                        <Text
-                          style={{
-                            fontWeight: 'bold',
-                            color: '#fff',
-                            fontSize: 24,
-                            lineHeight: 24,
-                          }}>
-                          {filters?.to}
-                        </Text>
+                        <Text style={styles.bold}>{filters?.to}</Text>
                       </View>
                     </View>
-                    <View
-                      style={{
-                        flexDirection: 'row',
-                        justifyContent: 'space-between',
-                        width: '100%',
-                      }}>
+                    <View style={styles.row}>
                       <View>
-                        <Text style={{color: '#fff'}}>Date:</Text>
+                        <Text style={{...styles.normal}}>Date:</Text>
                         <Text
                           style={{
-                            fontWeight: 'bold',
-                            color: '#fff',
+                            ...styles.bold,
                             fontSize: 18,
-                            lineHeight: 18,
                           }}>
                           {filters?.date?.toDateString()}
                         </Text>
                       </View>
                       <View>
-                        <Text style={{color: '#fff', textAlign: 'right'}}>
+                        <Text style={{...styles.normal, textAlign: 'right'}}>
                           Price:
                         </Text>
                         <Text
                           style={{
-                            fontWeight: 'bold',
-                            color: '#fff',
+                            ...styles.bold,
                             fontSize: 18,
-                            lineHeight: 18,
                           }}>
+                          <Text style={{fontSize: 14, color: '#fff5'}}>
+                            INR{' '}
+                          </Text>
                           {filters?.price}
                         </Text>
                       </View>
                     </View>
-                    <Button
-                      onPress={() => {
-                        setFilterSet(false);
-                      }}
-                      style={{
-                        backgroundColor: '#0005',
-                        width: 140,
-                      }}>
-                      <Text>Change</Text>
-                    </Button>
+                    <View style={styles.row}>
+                      <View>
+                        <Text style={{...styles.normal}}>Sort by price</Text>
+                        <TouchableOpacity
+                          onPress={() => {
+                            setAscending(prev => !prev);
+                          }}>
+                          <Text style={{...styles.bold, fontSize: 14}}>
+                            {ascending ? 'Ascending' : 'Descending'}
+                          </Text>
+                        </TouchableOpacity>
+                      </View>
+                      <Button
+                        onPress={() => {
+                          setFilterSet(false);
+                        }}
+                        style={{
+                          backgroundColor: '#0005',
+                          width: 140,
+                        }}>
+                        <Text>Change</Text>
+                      </Button>
+                    </View>
                   </View>
                 )}
               </>
@@ -212,15 +219,19 @@ const Home = () => {
         )
       ) : (
         <ImageBackground
-          blurRadius={50}
+          blurRadius={4}
           style={{width, height: '100%'}}
           source={{
             uri: 'https://w0.peakpx.com/wallpaper/609/335/HD-wallpaper-artistic-plane-in-the-sky-clouds-flight-art-aeroplane-thumbnail.jpg',
             // uri: 'https://wallpapercosmos.com/w/full/3/5/2/1274861-2160x3840-samsung-4k-aircraft-wallpaper-photo.jpg',
           }}>
           <View style={styles.inputContainer}>
+            <Text
+              style={{...styles.bold, textAlign: 'center', marginBottom: 30}}>
+              Book your journey with us and get exclusive offers!
+            </Text>
             <Text style={styles.enterDetails}>
-              Enter the details of your travel and we will get you the best
+              Provide us the details of your travel and we will get you the best
               available flights
             </Text>
             <View style={styles.row}>
@@ -322,20 +333,21 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    maxWidth: width,
+    width: '100%',
     gap: 10,
+    justifyContent: 'space-between',
   },
   enterDetails: {
     textAlign: 'center',
     fontSize: 16,
-    color: COLORS.white,
-    fontWeight: '600',
+    color: '#fffd',
+    // fontWeight: '600',
     maxWidth: width - 100,
     marginBottom: 20,
   },
   headerFilter: {
     gap: 10,
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 16,
     paddingVertical: 8,
     width,
@@ -347,5 +359,21 @@ const styles = StyleSheet.create({
     position: 'absolute',
     opacity: 0.5,
     top: 10,
+  },
+  bold: {
+    fontWeight: 'bold',
+    color: '#fff',
+    fontSize: 24,
+    lineHeight: 24,
+  },
+  blockCenter: {
+    width,
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  normal: {
+    fontSize: 14,
+    color: '#fff8',
   },
 });

@@ -42,7 +42,7 @@ const FlightDetails = ({route}: any) => {
               <Entypo
                 name="aircraft-take-off"
                 size={36}
-                color={COLORS.primary}
+                color={COLORS.secondary}
               />
               <Text style={styles.lightNormal}>Depart :</Text>
               <Text style={{...styles.normal}}>
@@ -62,7 +62,7 @@ const FlightDetails = ({route}: any) => {
               <Entypo
                 name="aircraft-landing"
                 size={36}
-                color={COLORS.primary}
+                color={COLORS.secondary}
               />
               <Text style={styles.lightNormal}>Arrival :</Text>
               <Text style={styles.normal}>
